@@ -4,12 +4,12 @@ import _ from 'lodash';
 import DbMysql from "../05_clients/db.mysql.js";
 
 export default {
-    async create(username, email, password) {
+    async create(username, age, email, password) {
         try {
             const result = await DbMysql.query(
-                `insert into users (username, email, password)
-                 values (?, ?, ?);`,
-                [username, email, password]
+                `insert into users (user_name, age, email, password)
+                 values (?, ?, ?, ?);`,
+                [username, age, email, password]
             );
 
 
@@ -18,7 +18,8 @@ export default {
             console.error(error);
             return null;
         }
-    },  async findUserByEmail(email) {
+    },
+    async findUserByEmail(email) {
         try {
             const [result = null] = (await DbMysql.query(
                 `SELECT *
@@ -38,7 +39,7 @@ export default {
             const [result = null] = (await DbMysql.query(
                 `SELECT *
                  FROM users
-                 WHERE id = ? limit 1;`,
+                 WHERE user_id = ? limit 1;`,
                 [id]
             )) || [];
 
@@ -52,9 +53,8 @@ export default {
         try {
             const [result = null] = (await DbMysql.query(
                 `SELECT *
-       FROM users
-       WHERE username = ?
-       limit 1;`,
+                 FROM users
+                 WHERE user_name = ? limit 1;`,
                 [username]
             )) || [];
 
@@ -68,9 +68,8 @@ export default {
         try {
             const [result = null] = (await DbMysql.query(
                 `SELECT *
-       FROM users
-       WHERE email = ?
-       limit 1;`,
+                 FROM users
+                 WHERE email = ? limit 1;`,
                 [email]
             )) || [];
 
@@ -84,9 +83,8 @@ export default {
         try {
             const [result = null] = (await DbMysql.query(
                 `SELECT *
-       FROM users
-       WHERE userId = ?
-       limit 1;`,
+                 FROM users
+                 WHERE user_id = ? limit 1;`,
                 [userId]
             )) || [];
 

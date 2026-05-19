@@ -17,6 +17,14 @@ export default {
         username: joi.string().min(3).max(50).required().messages({
             'string.empty': 'Имя обязательно'
         }),
+        age: joi.number().integer().min(0).max(120).required().messages({
+                'number.base': 'Возраст должен быть числом',
+                'number.integer': 'Возраст должен быть целым числом',
+                'number.min': 'Возраст не может быть меньше 0',
+                'number.max': 'Возраст не может быть больше 120',
+                'any.required': 'Возраст обязателен',
+                'string.empty': 'Возраст обязателен',
+            }),
         email: joi.string().email().min(5).max(100).required().messages({
             'string.empty': 'Email обязателен',
             'string.email': 'Email должен быть корректным',

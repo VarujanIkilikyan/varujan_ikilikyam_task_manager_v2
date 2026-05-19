@@ -5,7 +5,7 @@ import DbMysql from './05_clients/db.mysql.js';
     await DbMysql.query(`
         CREATE TABLE IF NOT EXISTS users (
             user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-            name VARCHAR(30),
+            user_name VARCHAR(30),
             age INT,
             email VARCHAR(255) UNIQUE,
             password VARCHAR(255)
@@ -14,7 +14,7 @@ import DbMysql from './05_clients/db.mysql.js';
     console.log('-> User table successfully created');
     await DbMysql.query(`
         CREATE TABLE IF NOT EXISTS tasks (
-            id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            task_id BIGINT PRIMARY KEY AUTO_INCREMENT,
             user_id BIGINT NOT NULL,
             title VARCHAR(255) NOT NULL,
             description TEXT,
@@ -27,7 +27,7 @@ import DbMysql from './05_clients/db.mysql.js';
     console.log('-> Tasks table successfully created');
     await DbMysql.query(`
         CREATE TABLE IF NOT EXISTS task_details (
-            id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            details_id BIGINT PRIMARY KEY AUTO_INCREMENT,
             task_id     BIGINT NOT NULL,
             priority    ENUM('low', 'medium', 'high') DEFAULT 'medium',
             location    VARCHAR(255),

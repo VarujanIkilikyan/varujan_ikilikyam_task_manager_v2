@@ -12,16 +12,8 @@ export default {
     async registration (req, res, next) {
         try {
 
-            const {username,email,password} = req.body;
-            if(await usersModel.checkUsernameExists(username)) {
+            const {username,age,email,password} = req.body;
 
-                throw  new HttpErrors(422,{
-                    message: 'Validation error',
-                    errors:{
-                        email: 'имя уже сушествует',
-                    }
-                })
-            }
             if(await usersModel.checkEmailExists(email)) {
 
                 throw  new HttpErrors(422,{
@@ -33,7 +25,7 @@ export default {
             }
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const user = await usersModel.create(username,email,hashedPassword)
+            const user = await usersModel.create(username,age,email,hashedPassword)
 
             delete user.password;
 
