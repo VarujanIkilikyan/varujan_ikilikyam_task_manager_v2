@@ -32,7 +32,7 @@ import DbMysql from './05_clients/db.mysql.js';
             priority    ENUM('low', 'medium', 'high') DEFAULT 'medium',
             location    VARCHAR(255),
             notes       TEXT,
-            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+            FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
             );
 `);
     console.log('-> Taask Details successfully created');

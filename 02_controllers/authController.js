@@ -4,6 +4,8 @@ import moment from 'moment';
 
 import usersModel from '../03_models/userModel.js';
 import tokenHandler from '../04_utils/tokenUtils.js';
+import userModel from "../03_models/userModel.js";
+import taskModel from "../03_models/taskModel.js";
 
 
 export default {
@@ -27,13 +29,14 @@ export default {
 
             const user = await usersModel.create(username,age,email,hashedPassword)
 
-            delete user.password;
+            const {user_id:userId,user_name:userName,age:userAge,email:userEmail} = user;
+            const userData ={userId,userName,userAge,userEmail}
 
 
 
             res.json({
                 message: 'User created successfully',
-                user
+                userData
             })
         } catch (e) {
             next(e);
@@ -52,21 +55,94 @@ export default {
                     }
                 })
             }
+            const {user_id:userId,user_name:userName,age:userAge,email:userEmail} = user;
+            const userData ={userId,userName,userAge,userEmail}
 
             const token = tokenHandler.encrypt(
-                {userId: user.userId,
+                {userId,
                     expiresIn: moment().add(30, 'minutes').toISOString(),
                 });
-            delete user.password;
+
 
 
             res.json({
                 message: "Login successful",
                 token,
-                user
+                userData
             })
 
         } catch (e) {
+            next(e);
+        }
+    },
+    async getUser(req, res, next) {
+        try {
+            const {userId} = req;
+
+            const user = await usersModel.findUserById(userId);
+            if(!user){
+                throw new HttpErrors(401,'ошыбка при загрузке профиля')
+            }
+
+            const {user_name:userName,age:userAge,email:userEmail} = user;
+            const newUserData ={userId,userName,userAge,userEmail}
+
+
+            res.json({
+                message: `профил ползвтеля ${userName}`,
+                newUserData
+            })
+
+        } catch (e) {
+            next(e);
+        }
+    },
+    async updateUser(req, res, next) {
+        try {
+            const {userId} = req;
+
+            const u = await  userModel.findUserById(userId);
+
+            const oldUserData ={
+                userId:u.user_id,
+                userName:u.user_name,
+                userAge:u.age,
+                userEmail:u.email,
+            }
+
+
+            const user = await usersModel.updateUser(userId,req.body);
+            if(!user){
+                throw new HttpErrors(401,'ошыбка при загрузке профиля')
+            }
+
+            const {user_name:userName,age:userAge,email:userEmail} = user;
+            const newUserData ={userId,userName,userAge,userEmail}
+
+
+            res.json({
+                message: `данные ползвтеля обнавлены`,
+                oldUserData,
+                newUserData
+            })
+
+        } catch (e) {
+            next(e);
+        }
+    },
+    async getAllUsers (req, res, next) {
+        try {
+            const {page,limit} = req.query;
+
+            const pageNum = Math.max(1, parseInt(page) || 1);
+            const limitNum = Math.max(1, parseInt(limit) || 5);
+
+            const userList = await userModel.getAllUser(pageNum,limitNum);
+            res.json({
+                message: 'get all users',
+                userList
+            })
+        }catch (e){
             next(e);
         }
     },

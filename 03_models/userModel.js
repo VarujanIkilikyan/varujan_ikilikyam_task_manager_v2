@@ -1,6 +1,4 @@
 import _ from 'lodash';
-
-
 import DbMysql from "../05_clients/db.mysql.js";
 
 export default {
@@ -93,6 +91,65 @@ export default {
             console.error(error);
             return null;
         }
+    },
+    async updateUser(userId, data,returnData= false) {
+        try {
+            const fields = Object.keys(data).map(key =>`${key}=?`).join(',')
+            const values = Object.values(data);
+            const result = await DbMysql.query(
+                ` update users
+                    set ${fields}
+                    WHERE user_id = ? LIMIT 1;`,
+                [...values, userId,],
+            );
+
+            const affectedRows = _.get(result, '0.affectedRows', null);
+
+            return affectedRows > 0
+                ? await this.findUserById(userId)
+                :returnData ;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+
+    },
+    async getAllUser( page, limit) {
+
+        const count = await this.getTotalUserCount();
+
+        const offset = Math.ceil((page - 1) * limit);
+
+        const [Users] = await DbMysql.query(
+            `SELECT user_id,user_name,age
+             FROM users
+              limit ?
+             offset ?`,
+            [+limit,+offset]
+        );
+        return {
+            Users,
+            pagination: {
+                "currentPage": page,
+                "totalPages": Math.ceil(count / limit),
+                "totalUsers": count,
+                "UsersPerPage": limit,
+            }
+        };
+
+    },
+    async getTotalUserCount() {
+        try {
+            const [[{count}]] = await DbMysql.query(
+                `SELECT COUNT(*) AS count
+                 FROM users`,
+            );
+            return count || 0;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+
     },
 }
 
