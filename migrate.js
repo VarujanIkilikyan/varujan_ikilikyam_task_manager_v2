@@ -3,31 +3,40 @@ import DbMysql from './05_clients/db.mysql.js';
 ;(async () => {
     console.log('Running migration...');
     await DbMysql.query(`
-      create table if not exists users
-      (
-          userId CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-          username VARCHAR(50) UNIQUE NOT NULL,
-          email VARCHAR(100) UNIQUE NOT NULL,
-          password VARCHAR(255) NOT NULL,
-          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
+        CREATE TABLE IF NOT EXISTS users (
+            user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            name VARCHAR(30),
+            age INT,
+            email VARCHAR(255) UNIQUE,
+            password VARCHAR(255)
+            );
   `);
     console.log('-> User table successfully created');
     await DbMysql.query(`
-    CREATE TABLE if not exists tasks (
-  taskId INT AUTO_INCREMENT PRIMARY KEY,
-  userId VARCHAR(36) NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  completed BOOLEAN DEFAULT FALSE,
-  taskDate DATE NOT NULL,
-  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
-);
+        CREATE TABLE IF NOT EXISTS tasks (
+            id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            user_id BIGINT NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            description TEXT,
+            completed   BOOLEAN DEFAULT FALSE,
+            task_date   DATE NOT NULL,
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            );
 `);
     console.log('-> Tasks table successfully created');
-    // await DbMysql.query(`CREATE INDEX IF NOT EXISTS idx_taskDate ON tasks(taskDate);`);
-    // await DbMysql.query(`CREATE INDEX IF NOT EXISTS idx_userId ON tasks(userId);`);
+    await DbMysql.query(`
+        CREATE TABLE IF NOT EXISTS task_details (
+            id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            task_id     BIGINT NOT NULL,
+            priority    ENUM('low', 'medium', 'high') DEFAULT 'medium',
+            location    VARCHAR(255),
+            notes       TEXT,
+            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+            );
+`);
+    console.log('-> Taask Details successfully created');
+
     console.log('Migration finished successfully.');
 })();
 

@@ -1,7 +1,7 @@
 import {Router} from "express";
 import views from "../02_controllers/views.js";
-import validate from "../04_utils/validate.js";
-import schemas from "../04_utils/schemas/auth.schema.js";
+import validate from "../01_middlewares/validation.js";
+import schemas from "../01_middlewares/schemas/auth.schema.js";
 
 import controller from "../02_controllers/authController.js";
 

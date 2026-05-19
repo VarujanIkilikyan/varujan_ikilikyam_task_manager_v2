@@ -3,7 +3,7 @@ import {Router} from "express";
 import views from "../02_controllers/views.js";
 import authRoutes from "./authRoutes.js";
 import tasksRoutes from "./taskRoutes.js";
-import authorization from "../01_middlewares/authMiddleware.js";
+import authorization from "../01_middlewares/authorization.js";
 
 const SelectorRouter = new Router();
 

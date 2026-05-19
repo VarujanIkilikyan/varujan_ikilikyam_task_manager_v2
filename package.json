@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "make task manager with sql",
   "main": "app.js",
-  "repository": "https://github.com/VarujanIkilikyan/task_manager.git",
+  "repository": "https://github.com/VarujanIkilikyan/varujan_ikilikyam_task_manager_v2.git",
   "author": "Varujan Ikilikyan",
   "license": "MIT",
   "type": "module",
