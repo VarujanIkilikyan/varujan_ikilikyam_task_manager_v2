@@ -4,17 +4,41 @@ import _ from 'lodash';
 import DbMysql from "../05_clients/db.mysql.js";
 
 export default {
-    async createTask(userId, title, description, taskDate) {
+    async createTask(userId, title, description, taskDate, details) {
         try {
             const result = await DbMysql.query(
-                `insert into tasks (userId, title, description, taskDate)
+                `insert into tasks (user_id, title, description, task_date)
                  values (?, ?, ?, ?);`,
                 [userId, title, description, taskDate],
             );
             const taskId = _.get(result, '0.insertId', null);
+            if(details){
+                const{priority,location,notes}= details;
+                const detail = await DbMysql.query(
+                    `insert into task_details (task_Id, priority, location, notes)
+                 values (?, ?, ?, ?);`,
+                    [taskId, priority, location, notes],
+                );}
+            const inerResult = await DbMysql.query(
+                `
+                    SELECT t.task_id,
+                           t.user_id,
+                           t.title,
+                           t.description,
+                           t.completed,
+                           t.task_date,
+                           td.priority,
+                           td.location,
+                           td.notes 
+                    FROM tasks t
+                    LEFT JOIN task_details td ON t.task_id = td.task_id
+                    WHERE t.task_id = ?
+                      AND t.user_id = ?`,
+                [taskId,userId],
+            );
 
 
-            return await this.getTaskById(taskId, userId);
+            return inerResult[0];
         } catch (error) {
             console.error(error);
             return null;

@@ -8,9 +8,9 @@ export default {
     async createNewTask (req, res, next) {
         try {
 
-            const {title,description,taskDate} = req.body;
+            const {title,description,taskDate,details} = req.body;
 
-            const task = await taskModel.createTask(req.userId, title, description, taskDate)
+            const task = await taskModel.createTask(req.userId, title, description,taskDate,details)
 
             res.json({
                 message: 'task created successfully',
