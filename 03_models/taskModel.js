@@ -51,9 +51,51 @@ export default {
         const offset = Math.ceil((page - 1) * limit);
 
         const [tasks] = await DbMysql.query(
-            `SELECT *
-             FROM tasks
-             WHERE userId = ? limit ?
+            `SELECT t.task_id,
+                    t.user_id,
+                    t.title,
+                    t.description,
+                    t.completed,
+                    t.task_date,
+                    td.priority,
+                    td.location,
+                    td.notes
+             FROM tasks t
+             LEFT JOIN task_details td ON t.task_id = td.task_id
+             WHERE t.user_id = ? limit ?
+             offset ?`,
+            [userId, limit, offset]
+        );
+        return {
+            tasks,
+            pagination: {
+                "currentPage": page,
+                "totalPages": Math.ceil(count / limit),
+                "totalTasks": count,
+                "tasksPerPage": limit,
+            }
+        };
+
+    },
+    async getAllTasksByUserWithDetails(userId, page, limit) {
+
+        const count = await this.getTotalTasksCountByUser(userId);
+
+        const offset = Math.ceil((page - 1) * limit);
+
+        const [tasks] = await DbMysql.query(
+            `SELECT t.task_id,
+                    t.user_id,
+                    t.title,
+                    t.description,
+                    t.completed,
+                    t.task_date,
+                    td.priority,
+                    td.location,
+                    td.notes
+             FROM tasks t
+             INNER JOIN task_details td ON t.task_id = td.task_id
+             WHERE t.user_id = ? limit ?
              offset ?`,
             [userId, limit, offset]
         );
@@ -73,7 +115,7 @@ export default {
             const [[{count}]] = await DbMysql.query(
                 `SELECT COUNT(*) AS count
                  FROM tasks
-                 WHERE userId = ?`,
+                 WHERE user_id = ?`,
                 [userId]
             );
             return count || 0;

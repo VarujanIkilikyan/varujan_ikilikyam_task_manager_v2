@@ -12,6 +12,8 @@ const tasksRoutes = Router();
 tasksRoutes.post('/',authorization,controller.createNewTask);
 
 tasksRoutes.get('/',authorization,controller.getAllTasks)
+tasksRoutes.get('/with-details',authorization,controller.getAllTasksWithDetails)
+
 tasksRoutes.get('/:id',authorization,controller.getTaskById)
 tasksRoutes.put('/:id',authorization,controller.updateTask)
 tasksRoutes.delete('/:id',authorization,controller.deleteTask)

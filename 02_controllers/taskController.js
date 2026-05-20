@@ -36,6 +36,22 @@ export default {
             next(e);
         }
     },
+    async getAllTasksWithDetails (req, res, next) {
+        try {
+            const {page,limit} = req.query;
+
+            const pageNum = Math.max(1, parseInt(page) || 1);
+            const limitNum = Math.max(1, parseInt(limit) || 5);
+
+            const task = await taskModel.getAllTasksByUserWithDetails(req.userId,pageNum,limitNum);
+            res.json({
+                message: 'get all tasks With Details',
+                task
+            })
+        }catch (e){
+            next(e);
+        }
+    },
     async getTaskById(req, res, next) {
         try {
             const {id} = req.params;
