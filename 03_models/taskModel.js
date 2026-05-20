@@ -62,7 +62,9 @@ export default {
                     td.notes
              FROM tasks t
              LEFT JOIN task_details td ON t.task_id = td.task_id
-             WHERE t.user_id = ? limit ?
+             WHERE t.user_id = ?
+             ORDER BY t.task_id ASC
+             limit ?
              offset ?`,
             [userId, limit, offset]
         );
@@ -95,7 +97,9 @@ export default {
                     td.notes
              FROM tasks t
              INNER JOIN task_details td ON t.task_id = td.task_id
-             WHERE t.user_id = ? limit ?
+             WHERE t.user_id = ?
+             ORDER BY t.task_id ASC
+             limit ?
              offset ?`,
             [userId, limit, offset]
         );
@@ -145,10 +149,11 @@ export default {
         try {
             const [result = null] = (await DbMysql.query(
                 `SELECT *
-                 FROM tasks
-                 WHERE userId = ?
-                   AND taskId = ? LIMIT 1;`,
-                [userId, taskId]
+                 FROM tasks t
+                 LEFT JOIN task_details td ON t.task_id = td.task_id
+                 WHERE t.task_id = ?
+                   AND t.user_id = ? LIMIT 1;`,
+                [taskId,userId]
             )) || [];
 
             return _.head(result) || null;
@@ -161,7 +166,7 @@ export default {
     async getTaskCountByDateAndUser(taskDate, userId) {
 
     },
-    async updateTask(id, userId, {title, description,completed, taskDate},returnData= false) {
+    async updateTask(id, userId, {title, description,completed, taskDate,details},returnData= false) {
         try {
             const result = await DbMysql.query(
                 `
@@ -170,10 +175,21 @@ export default {
                         description  = ?,
                         completed = ?,
                         taskDate = ?
-                    WHERE userId = ?
-                      AND taskId = ? LIMIT 1;`,
+                    WHERE user_id = ?
+                      AND task_id = ? LIMIT 1;`,
                 [title, description, completed, taskDate,userId,id],
             );
+            if(details){
+                const{priority,location,notes}= details;
+                const detail = await DbMysql.query(
+                    `  update tasks_details
+                       set priority = ?,
+                           location  = ?,
+                           notes = ?
+                       WHERE task_id = ?
+                         AND details_id = ? LIMIT 1;`,
+                    [priority, location, notes,taskId],
+                );}
 
             const affectedRows = _.get(result, '0.affectedRows', null);
 
@@ -193,8 +209,8 @@ export default {
                 `
                     DELETE
                     FROM tasks
-                    WHERE userId = ?
-                      AND taskId = ? LIMIT 1;`,
+                    WHERE userd_id = ?
+                      AND task_id = ? LIMIT 1;`,
                 [userId,id],
             );
             return del;

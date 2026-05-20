@@ -9,12 +9,12 @@ import controller from "../02_controllers/taskController.js";
 const tasksRoutes = Router();
 
 
-tasksRoutes.post('/',authorization,controller.createNewTask);
+tasksRoutes.post('/',authorization,validate(schemas.create,'body'),controller.createNewTask);
 
-tasksRoutes.get('/',authorization,controller.getAllTasks)
-tasksRoutes.get('/with-details',authorization,controller.getAllTasksWithDetails)
+tasksRoutes.get('/',authorization,validate(schemas.list,'query'),controller.getAllTasks)
+tasksRoutes.get('/with-details',validate(schemas.list,'query'),authorization,controller.getAllTasksWithDetails)
 
-tasksRoutes.get('/:id',authorization,controller.getTaskById)
+tasksRoutes.get('/:id',authorization,validate(schemas.param,'params'),controller.getTaskById)
 tasksRoutes.put('/:id',authorization,controller.updateTask)
 tasksRoutes.delete('/:id',authorization,controller.deleteTask)
 
