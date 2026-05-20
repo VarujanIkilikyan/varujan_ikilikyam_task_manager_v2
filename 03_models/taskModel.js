@@ -79,7 +79,7 @@ export default {
     },
     async getAllTasksByUserWithDetails(userId, page, limit) {
 
-        const count = await this.getTotalTasksCountByUser(userId);
+        const count = await this.getTotalTasksCountByUserWithDetails(userId);
 
         const offset = Math.ceil((page - 1) * limit);
 
@@ -108,6 +108,22 @@ export default {
                 "tasksPerPage": limit,
             }
         };
+
+    },
+    async getTotalTasksCountByUserWithDetails(userId) {
+        try {
+            const [[{count}]] = await DbMysql.query(
+                `SELECT COUNT(*) AS count
+                 FROM tasks t
+                 INNER JOIN task_details td ON t.task_id = td.task_id
+                 WHERE t.user_id = ?;`,
+                [userId]
+            );
+            return count || 0;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
 
     },
     async getTotalTasksCountByUser(userId) {
