@@ -1,1 +1,53 @@
-<h1>Home Page</h1>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div id="mainbox">
+    <div id="userprofile">
+        <div id="userinfo">
+
+        </div>
+    </div>
+    <div id="imputbox">
+        <div id="formbox">
+            <form id="inputForm">
+
+                <div class="form-group">
+                    <label for="title">title</label>
+                    <input type="text" id="title" name="title" placeholder="Введите загаловк"  />
+                    <span class="error-message" data-error="title"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="description">description</label>
+                    <textarea id="description" name="description" placeholder="Введите текст" ></textarea>
+                    <span class="error-message" data-error="description" ></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="taskDate">taskDate</label>
+                    <input type="date" id="taskDate" name="taskDate"/>
+                    <span class="error-message" data-error="taskDate" ></span>
+                </div>
+                <button type="button"  id="moreBtn">болше</button>
+                <button type="submit" id="submitBtn">создать</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="taskbox">
+
+</div>
+
+<script type="module" src="/javascript/checkToken.js"></script>
+<script type="module" src="/javascript/index.js"></script>
+</body>
+</html>

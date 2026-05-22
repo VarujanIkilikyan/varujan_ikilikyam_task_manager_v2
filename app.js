@@ -16,8 +16,8 @@ const server = createServer(app);
 app.use(logger('dev'))
 //view engin setup
 app.set('view engine', 'ejs');
-app.set('views',path.resolve()+'/views');
-app.use(express.static('/public'));
+app.set('views', path.join(path.resolve(), 'views'));
+app.use(express.static(path.join(path.resolve(), 'public')));
 
 //transform post body req.body
 app.use(express.json());
