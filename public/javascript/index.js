@@ -185,9 +185,10 @@ function createTaskElement(taskData) {
     editBtn.textContent = 'edit';
 
 
-    const completeBtn = document.createElement('button');
+    const completeBtn = document.createElement('input');
     completeBtn.className = 'iscomplited';
     completeBtn.textContent = 'x';
+    completeBtn.type = 'checkbox';
 
 
     completeBtn.addEventListener('click', async () => {
@@ -253,7 +254,11 @@ function createTaskElement(taskData) {
 
 async function createTaskBord() {
     try {
-        const response = await fetch('/tasks', {
+        const queryData = new URLSearchParams(location.search);
+        const page = queryData.get('page')|| 1;
+        const limit = 2
+
+        const response = await fetch(`/tasks?page=${page}&limit=${limit}`, {
             method: 'GET',
             headers: {
                 'Authorization': `${token}`
@@ -264,6 +269,7 @@ async function createTaskBord() {
 
         const result = await response.json();
         const data = result.task?.tasks;
+
 
 
         const container = document.createElement('div');
@@ -298,3 +304,5 @@ async function renderTasks() {
     app.appendChild(tasksElement);
 }
 await renderTasks();
+
+// function createPagention

@@ -47,8 +47,12 @@ export default {
     async getAllTasksByUser(userId, page, limit) {
 
         const count = await this.getTotalTasksCountByUser(userId);
+        const totalPages = Math.ceil(count / limit);
+        if(totalPages<page){page = 1}
 
         const offset = Math.ceil((page - 1) * limit);
+
+
 
         const [tasks] = await DbMysql.query(
             `SELECT t.task_id,
@@ -72,7 +76,7 @@ export default {
             tasks,
             pagination: {
                 "currentPage": page,
-                "totalPages": Math.ceil(count / limit),
+                "totalPages": totalPages,
                 "totalTasks": count,
                 "tasksPerPage": limit,
             }
