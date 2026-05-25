@@ -1,8 +1,8 @@
 import HttpErrors from 'http-errors';
 import moment from 'moment';
 
-import tokenHandler from '../04_utils/tokenUtils.js';
-import userModel from "../03_models/userModel.js";
+import tokenHandler from '../utils/tokenUtils.js';
+import userModel from "../models/userModel.js";
 
 
 export  default  async (req,res,next)=>{

@@ -2,10 +2,10 @@ import HttpErrors from 'http-errors';
 import bcrypt from "bcrypt";
 import moment from 'moment';
 
-import usersModel from '../03_models/userModel.js';
-import tokenHandler from '../04_utils/tokenUtils.js';
-import userModel from "../03_models/userModel.js";
-import taskModel from "../03_models/taskModel.js";
+import usersModel from '../models/userModel.js';
+import tokenHandler from '../utils/tokenUtils.js';
+import userModel from "../models/userModel.js";
+import taskModel from "../models/taskModel.js";
 
 
 export default {

@@ -1,6 +1,6 @@
 import {Router} from "express";
 
-import views from "../02_controllers/views.js";
+import views from "../controllers/views.js";
 import authRoutes from "./authRoutes.js";
 import tasksRoutes from "./taskRoutes.js";
 

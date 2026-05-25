@@ -6,8 +6,8 @@ import path from 'path';
 
 import './migrate.js';
 
-import SelectorRouter from './00_routes/index.js';
-import errorHandler from "./01_middlewares/errorHandler.js";
+import SelectorRouter from './routes/index.js';
+import errorHandler from "./middlewares/errorHandler.js";
 
 
 const app = express();

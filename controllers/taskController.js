@@ -1,6 +1,6 @@
 import HttpErrors from 'http-errors';
 
-import taskModel from '../03_models/taskModel.js';
+import taskModel from '../models/taskModel.js';
 
 export default {
 

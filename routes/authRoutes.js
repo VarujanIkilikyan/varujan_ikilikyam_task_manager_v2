@@ -1,12 +1,12 @@
 import {Router} from "express";
 
 
-import validate from "../01_middlewares/validation.js";
-import schemas from "../01_middlewares/schemas/auth.schema.js";
-import authorization from "../01_middlewares/authorization.js";
+import validate from "../middlewares/validation.js";
+import schemas from "../middlewares/schemas/auth.schema.js";
+import authorization from "../middlewares/authorization.js";
 
-import views from "../02_controllers/views.js";
-import controller from "../02_controllers/authController.js";
+import views from "../controllers/views.js";
+import controller from "../controllers/authController.js";
 
 const authRoutes = Router();
 
