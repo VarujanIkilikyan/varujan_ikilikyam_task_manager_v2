@@ -30,6 +30,49 @@ if (!localStorage.getItem('token')) {
 
 const token = localStorage.getItem('token');
 
+async function loadUser() {
+    try {
+        const response = await fetch('/users/profile', {
+        method: 'get',
+        headers: {
+            'Authorization': `${token}`
+        },
+    });
+        if (!response.ok) throw new Error('Не удалось загрузить');
+
+        const result = await response.json();
+        const userinfo= document.getElementById('userinfo');
+        const name =document.createElement('h1');
+        name.textContent = `Name:${result.newUserData.userName}`
+        name.className = 'user-name';
+
+        const email =document.createElement('h2');
+        email.textContent = `Email:${result.newUserData.userEmail}`
+        email.className = 'user-email';
+
+        const age =document.createElement('h3');
+        age.textContent = `Age:${result.newUserData.userAge}`
+        age.className = 'user-userAge';
+
+        const userid =document.createElement('p');
+        userid.textContent = `ID:${result.newUserData.userId}`
+        userid.className = 'user-userId';
+
+
+        userinfo.appendChild(name);
+        userinfo.appendChild(email);
+        userinfo.appendChild(age);
+        userinfo.appendChild(userid);
+        console.log(result);
+    }catch (error) {
+        console.error(error);
+    }
+
+
+
+}
+await loadUser();
+
 document.getElementById('inputForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -59,6 +102,8 @@ document.getElementById('inputForm').addEventListener('submit', async function(e
         const result = await response.json();
 
         console.log(result);
+        await renderTasks();
+        createPagination(pagination);
     }catch (error) {
         console.log(error);
     }
@@ -68,6 +113,7 @@ document.getElementById('inputForm').addEventListener('submit', async function(e
 const moreandless = document.getElementById('moreBtn')
 moreandless.addEventListener('click', addFieldWithRemove)
 const addedGroups = [];
+let pagination ={};
 
 function addFieldWithRemove() {
 
@@ -148,12 +194,18 @@ function createTaskElement(taskData) {
     const taskDiv = document.createElement('div');
     taskDiv.className = 'taskdiv';
 
+    const infokDiv = document.createElement('div');
+    infokDiv.className = 'info';
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'actions';
+
 
     const titleEl = document.createElement('h2');
     titleEl.className = 'title';
     titleEl.textContent = taskData.title;
 
-    // Описание
+
     const descriptionEl = document.createElement('p');
     descriptionEl.className = 'description';
     descriptionEl.textContent = taskData.description;
@@ -183,30 +235,180 @@ function createTaskElement(taskData) {
     const editBtn = document.createElement('button');
     editBtn.className = 'edit';
     editBtn.textContent = 'edit';
+    editBtn.dataset.taskId = taskData.task_id;
+
+
+    editBtn.addEventListener('click', async function() {
+        const taskId = this.dataset.taskId;
+
+        let titleInput, descriptionInput, taskDateInput, notesInput, locationInput, priorityLabelInput;
+
+        if (this.textContent === 'edit') {
+
+            this.textContent = 'update';
+            this.classList.add('update-mode');
+            console.log('Переключено в режим обновления для задачи:', taskId);
+
+            const taskDiv = this.closest('.taskdiv');
+            const infoDiv = taskDiv.querySelector('.info');
+            infoDiv.innerHTML = '';
+
+
+            const titleLabel = document.createElement('label');
+            titleLabel.htmlFor = 'titleUp'; // соответствует id input
+            titleLabel.textContent = 'Title:';
+            infoDiv.appendChild(titleLabel);
+
+            titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.id = 'titleUp';
+            titleInput.name = 'titleUp';
+            titleInput.value = taskData.title;
+            infoDiv.appendChild(titleInput);
+
+
+            const descriptionLabel = document.createElement('label');
+            descriptionLabel.htmlFor = 'descriptionUp';
+            descriptionLabel.textContent = 'Description:';
+            infoDiv.appendChild(descriptionLabel);
+
+            descriptionInput = document.createElement('textarea');
+            descriptionInput.id = 'descriptionUp';
+            descriptionInput.name = 'descriptionUp';
+            descriptionInput.value = taskData.description;
+            infoDiv.appendChild(descriptionInput);
+
+
+            const taskDateLabel = document.createElement('label');
+            taskDateLabel.htmlFor = 'taskDateUp';
+            taskDateLabel.textContent = 'Date:';
+            infoDiv.appendChild(taskDateLabel);
+
+            taskDateInput = document.createElement('input');
+            taskDateInput.type = 'date';
+            taskDateInput.id = 'taskDateUp';
+            taskDateInput.name = 'taskDateUp';
+            const dateOnly = taskData.task_date.split('T')[0];
+            taskDateInput.value = dateOnly;
+            infoDiv.appendChild(taskDateInput);
+
+
+            const notesLabel = document.createElement('label');
+            notesLabel.htmlFor = 'notesUp';
+            notesLabel.textContent = 'Notes:';
+            infoDiv.appendChild(notesLabel);
+
+            notesInput = document.createElement('input');
+            notesInput.id = 'notesUp';
+            notesInput.name = 'notesUp';
+            notesInput.value = taskData.notes;
+            infoDiv.appendChild(notesInput);
+
+
+            const locationLabel = document.createElement('label');
+            locationLabel.htmlFor = 'locationUp';
+            locationLabel.textContent = 'Location:';
+            infoDiv.appendChild(locationLabel);
+
+            locationInput = document.createElement('input');
+            locationInput.id = 'locationUp';
+            locationInput.name = 'locationUp';
+            locationInput.value = taskData.location;
+            infoDiv.appendChild(locationInput);
+
+
+            const priorityLabel = document.createElement('label');
+            priorityLabel.htmlFor = 'priorityUp';
+            priorityLabel.textContent = 'Priority:';
+            infoDiv.appendChild(priorityLabel);
+
+            priorityLabelInput = document.createElement('select');
+            priorityLabelInput.id = 'priorityUp';
+            priorityLabelInput.name = 'priorityUp';
+
+            const options = [
+                { value: 'low', text: 'Low' },
+                { value: 'medium', text: 'Medium' },
+                { value: 'high', text: 'High' }
+            ];
+
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.value;
+                optionElement.textContent = option.text;
+                priorityLabelInput.appendChild(optionElement);
+            });
+
+            priorityLabelInput.value = taskData.priority || 'medium';
+            infoDiv.appendChild(priorityLabelInput);
+        } else {
+
+            const taskDiv = this.closest('.taskdiv');
+            const infoDiv = taskDiv.querySelector('.info');
+
+            titleInput = infoDiv.querySelector('input[name="titleUp"]');
+            descriptionInput = infoDiv.querySelector('textarea[name="descriptionUp"]');
+            taskDateInput = infoDiv.querySelector('input[name="taskDateUp"]');
+            notesInput = infoDiv.querySelector('input[name="notesUp"]');
+            locationInput = infoDiv.querySelector('input[name="locationUp"]');
+            priorityLabelInput = infoDiv.querySelector('select[name="priorityUp"]');
+
+            try {
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({
+                        title: titleInput.value,
+                        description: descriptionInput.value,
+                        task_date: taskDateInput.value,
+                        details: {
+                            notes: notesInput.value,
+                            location: locationInput.value,
+                            priority: priorityLabelInput.value
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    this.textContent = 'edit';
+                    this.classList.remove('update-mode');
+                    console.log('Задача обновлена успешно');
+                    await renderTasks();
+                }
+            } catch (error) {
+                console.error('Ошибка при обновлении:', error);
+            }
+        }
+    });
 
 
     const completeBtn = document.createElement('input');
     completeBtn.className = 'iscomplited';
     completeBtn.textContent = 'x';
     completeBtn.type = 'checkbox';
+    completeBtn.checked = taskData.completed;
+    completeBtn.dataset.taskId = taskData.task_id;
 
 
-    completeBtn.addEventListener('click', async () => {
+    completeBtn.addEventListener('click', async function() {
         try {
-            const response = await fetch(`/tasks/${taskData.task_id}/complete`, {
-                method: 'POST',
+            const taskId = this.dataset.taskId;
+            const response = await fetch(`/tasks/${taskId}`, {
+                method: 'PUT',
                 headers: {
+                    'Authorization': `${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    completed: taskData.completed ? 0 : 1
+                    completed: completeBtn.checked
                 })
             });
 
             if (response.ok) {
-
-                taskData.completed = taskData.completed ? 0 : 1;
-                completeBtn.textContent = taskData.completed ? '✓' : 'x';
+                console.log(await response.json());
             }
         } catch (error) {
             console.error('Ошибка при обновлении статуса:', error);
@@ -217,21 +419,41 @@ function createTaskElement(taskData) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete';
     deleteBtn.textContent = 'delete';
+    deleteBtn.dataset.taskId = taskData.task_id;
 
 
-    deleteBtn.addEventListener('click', async () => {
+
+    deleteBtn.addEventListener('click', async function(event) {
         if (!confirm('Вы уверены, что хотите удалить эту задачу?')) return;
 
         try {
-            const response = await fetch(`/api/tasks/${taskData.task_id}`, {
-                method: 'DELETE'
+            const taskId = this.dataset.taskId;
+            if (!taskId) {
+                console.error('ID задачи не найден');
+                alert('Не удалось определить ID задачи');
+                return;
+            }
+
+            console.log('Удалён щалача с ID:', taskId);
+
+            const response = await fetch(`/tasks/${taskId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `${token}`
+                }
             });
 
             if (response.ok) {
-                taskDiv.remove();
+                if (taskDiv) {
+                    taskDiv.remove();
+                } else {
+                    console.warn('Элемент taskDiv не найден');
+                }
             } else {
                 alert('Ошибка при удалении задачи');
             }
+            await renderTasks();
+            createPagination(pagination);
         } catch (error) {
             console.error('Ошибка при удалении:', error);
             alert('Не удалось удалить задачу');
@@ -239,15 +461,17 @@ function createTaskElement(taskData) {
     });
 
 
-    taskDiv.appendChild(titleEl);
-    taskDiv.appendChild(descriptionEl);
-    taskDiv.appendChild(dateEl);
-    taskDiv.appendChild(notesEl);
-    taskDiv.appendChild(locationEl);
-    taskDiv.appendChild(priorityEl);
-    taskDiv.appendChild(editBtn);
-    taskDiv.appendChild(completeBtn);
-    taskDiv.appendChild(deleteBtn);
+    taskDiv.appendChild(infokDiv);
+    taskDiv.appendChild(actionsDiv);
+    infokDiv.appendChild(titleEl);
+    infokDiv.appendChild(descriptionEl);
+    infokDiv.appendChild(dateEl);
+    infokDiv.appendChild(notesEl);
+    infokDiv.appendChild(locationEl);
+    infokDiv.appendChild(priorityEl);
+    actionsDiv.appendChild(editBtn);
+    actionsDiv.appendChild(completeBtn);
+    actionsDiv.appendChild(deleteBtn);
 
     return taskDiv;
 }
@@ -289,6 +513,8 @@ async function createTaskBord() {
         });
 
         container.appendChild(fragment);
+        pagination = result.task.pagination;
+
         return container;
     } catch (error) {
         console.error('Ошибка в createTaskBord:', error);
@@ -303,6 +529,29 @@ async function renderTasks() {
     app.innerHTML = '';
     app.appendChild(tasksElement);
 }
-await renderTasks();
 
-// function createPagention
+
+function createPagination(pagination) {
+
+    const paginationBox = document.getElementById('pagenationbox');
+    paginationBox.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+
+
+    for (let i = 1; i <= pagination.totalPages; i++) {
+        const link = document.createElement('a');
+        link.href = `/?page=${i}`;
+        link.textContent = i;
+        link.classList.add('pagination-link');
+
+        if (pagination.currentPage === i) {
+            link.classList.add('active');
+        }
+        fragment.appendChild(link);
+    }
+
+    paginationBox.appendChild(fragment);
+}
+
+await renderTasks();
+createPagination(pagination);

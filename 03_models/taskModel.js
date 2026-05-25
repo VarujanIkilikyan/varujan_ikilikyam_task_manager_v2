@@ -67,7 +67,7 @@ export default {
              FROM tasks t
              LEFT JOIN task_details td ON t.task_id = td.task_id
              WHERE t.user_id = ?
-             ORDER BY t.task_id ASC
+             ORDER BY t.task_id DESC
              limit ?
              offset ?`,
             [userId, limit, offset]
@@ -170,29 +170,33 @@ export default {
     async getTaskCountByDateAndUser(taskDate, userId) {
 
     },
-    async updateTask(id, userId, {title, description,completed, taskDate,details},returnData= false) {
+    async updateTask(id, userId, updateData,returnData= false) {
         try {
+            const oldobj = await this.getTaskById(id,userId)
+
             const result = await DbMysql.query(
                 `
                     update tasks
                     set title = ?,
                         description  = ?,
                         completed = ?,
-                        taskDate = ?
+                        task_date = ?
                     WHERE user_id = ?
                       AND task_id = ? LIMIT 1;`,
-                [title, description, completed, taskDate,userId,id],
+                [updateData.title||oldobj.title,
+                    updateData.description||oldobj.description,
+                    updateData.completed !== null && updateData.completed !== undefined ? updateData.completed : oldobj.completed,
+                    updateData.taskDate||oldobj.task_date,
+                    userId,id],
             );
-            if(details){
-                const{priority,location,notes}= details;
+            if(updateData.details){
                 const detail = await DbMysql.query(
-                    `  update tasks_details
+                    `  update task_details
                        set priority = ?,
                            location  = ?,
                            notes = ?
-                       WHERE task_id = ?
-                         AND details_id = ? LIMIT 1;`,
-                    [priority, location, notes,taskId],
+                       WHERE task_id = ? LIMIT 1;`,
+                    [updateData.details.priority||oldobj.details.priority,updateData.details.location||oldobj.details.location,updateData.details.notes||oldobj.details.notes,id],
                 );}
 
             const affectedRows = _.get(result, '0.affectedRows', null);
@@ -213,7 +217,7 @@ export default {
                 `
                     DELETE
                     FROM tasks
-                    WHERE userd_id = ?
+                    WHERE user_id = ?
                       AND task_id = ? LIMIT 1;`,
                 [userId,id],
             );

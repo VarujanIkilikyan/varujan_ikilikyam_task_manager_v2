@@ -83,6 +83,7 @@ export default {
     async deleteTask(req, res, next) {
         try {
             const {id} = req.params;
+            console.log(id)
 
             const task = await taskModel.deleteTask(id,req.userId);
             res.json({
