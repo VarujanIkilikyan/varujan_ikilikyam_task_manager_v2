@@ -15,7 +15,7 @@ tasksRoutes.get('/',authorization,validate(schemas.list,'query'),controller.getA
 tasksRoutes.get('/with-details',validate(schemas.list,'query'),authorization,controller.getAllTasksWithDetails)
 
 tasksRoutes.get('/:id',authorization,validate(schemas.param,'params'),controller.getTaskById)
-tasksRoutes.put('/:id',authorization,controller.updateTask)
-tasksRoutes.delete('/:id',authorization,controller.deleteTask)
+tasksRoutes.put('/:id',authorization,validate(schemas.param,'params'),validate(schemas.update,'body'),controller.updateTask)
+tasksRoutes.delete('/:id',authorization,validate(schemas.param,'params'),controller.deleteTask)
 
 export default tasksRoutes;

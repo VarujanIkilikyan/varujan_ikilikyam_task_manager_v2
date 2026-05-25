@@ -17,7 +17,7 @@ export default {
                 const detail = await DbMysql.query(
                     `insert into task_details (task_Id, priority, location, notes)
                  values (?, ?, ?, ?);`,
-                    [taskId, priority, location, notes],
+                    [taskId, priority, location||'неизвестно', notes || 'нет заменчаний'],
                 );}
             const inerResult = await DbMysql.query(
                 `

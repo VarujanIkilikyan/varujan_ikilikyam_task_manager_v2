@@ -299,9 +299,11 @@ function createTaskElement(taskData) {
             infoDiv.appendChild(notesLabel);
 
             notesInput = document.createElement('input');
+            notesInput.type = 'text';
             notesInput.id = 'notesUp';
             notesInput.name = 'notesUp';
-            notesInput.value = taskData.notes;
+            notesInput.value = taskData.notes ;
+            notesInput.className = 'form-control';
             infoDiv.appendChild(notesInput);
 
 
@@ -311,9 +313,11 @@ function createTaskElement(taskData) {
             infoDiv.appendChild(locationLabel);
 
             locationInput = document.createElement('input');
+            locationInput.type = 'text';
             locationInput.id = 'locationUp';
             locationInput.name = 'locationUp';
-            locationInput.value = taskData.location;
+            locationInput.value = taskData.location ;
+            locationInput.className = 'form-control';
             infoDiv.appendChild(locationInput);
 
 
