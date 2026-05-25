@@ -255,7 +255,7 @@ function createTaskElement(taskData) {
 
 
             const titleLabel = document.createElement('label');
-            titleLabel.htmlFor = 'titleUp'; // соответствует id input
+            titleLabel.htmlFor = 'titleUp';
             titleLabel.textContent = 'Title:';
             infoDiv.appendChild(titleLabel);
 
