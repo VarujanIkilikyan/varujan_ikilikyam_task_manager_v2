@@ -15,6 +15,7 @@ authRoutes.post('/register',validate(schemas.register,'body'),controller.registr
 
 authRoutes.get('/login',views.viewRender('login'));
 authRoutes.post('/login',validate(schemas.login,'body'),controller.login);
+authRoutes.get('/logout',controller.logout);
 
 authRoutes.get('/profile',authorization,controller.getUser);
 authRoutes.put('/profile',authorization,validate(schemas.update,'body'),controller.updateUser);

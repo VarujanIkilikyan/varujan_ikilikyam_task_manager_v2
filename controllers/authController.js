@@ -148,5 +148,24 @@ export default {
         }
     },
 
+    async logout(req, res, next) {
+        try {
+            await new Promise((resolve, reject) => {
+                req.session.destroy((err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+            res.clearCookie('session');
+            res.redirect('/users/login');
+
+        } catch (err) {
+            next(err);
+        }
+    }
+
 }
 

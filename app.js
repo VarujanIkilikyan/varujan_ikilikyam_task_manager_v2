@@ -4,6 +4,7 @@ import 'dotenv/config'
 import logger from 'morgan';
 import path from 'path';
 import expressSession from 'express-session';
+import MySQLStoreFactory from  'express-mysql-session';
 
 import './migrate.js';
 
@@ -20,8 +21,39 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(path.resolve(), 'views'));
 app.use(express.static(path.join(path.resolve(), 'public')));
 
+//express Session class creator
+const MySQLStore = MySQLStoreFactory(expressSession);
+//express Session config
+const {MY_SQL_HOST,MY_SQL_PORT,MY_SQL_USER,MY_SQL_PASSWORD,MY_SQL_DATABASE}= process.env
+const options = {
+    host: MY_SQL_HOST,
+    port: MY_SQL_PORT,
+    user: MY_SQL_USER,
+    password: MY_SQL_PASSWORD,
+    database: MY_SQL_DATABASE,
+
+    clearExpired: true,
+    checkExpirationInterval: 1800000,
+
+    createDatabaseTable: true,
+    tableName: 'sessions',
+
+    // schema: {
+    //     columnNames: {
+    //         session_id: 'session_id',
+    //         expires: 'expires',
+    //         data: 'data'
+    //     }
+    // }
+
+}
+
+const sessionStore = new MySQLStore(options);
 //express Session
 app.use(expressSession({
+    name: 'session',
+    store: sessionStore,
+
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
