@@ -3,6 +3,7 @@ import {createServer} from 'http';
 import 'dotenv/config'
 import logger from 'morgan';
 import path from 'path';
+import expressSession from 'express-session';
 
 import './migrate.js';
 
@@ -18,6 +19,18 @@ app.use(logger('dev'))
 app.set('view engine', 'ejs');
 app.set('views', path.join(path.resolve(), 'views'));
 app.use(express.static(path.join(path.resolve(), 'public')));
+
+//express Session
+app.use(expressSession({
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: +process.env.COOKIE_COOKIE_TIME,
+        httpOnly: true,
+        secure: false,
+    },
+}));
 
 //transform post body req.body
 app.use(express.json());

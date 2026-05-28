@@ -58,16 +58,17 @@ export default {
             const {user_id:userId,user_name:userName,age:userAge,email:userEmail} = user;
             const userData ={userId,userName,userAge,userEmail}
 
-            const token = tokenHandler.encrypt(
-                {userId,
-                    expiresIn: moment().add(30, 'minutes').toISOString(),
-                });
+            // const token = tokenHandler.encrypt(
+            //     {userId,
+            //         expiresIn: moment().add(30, 'minutes').toISOString(),
+            //     });
+            req.session.userId = userData.userId;
 
 
 
             res.json({
                 message: "Login successful",
-                token,
+                // token,
                 userData
             })
 

@@ -7,23 +7,23 @@ import userModel from "../models/userModel.js";
 
 export  default  async (req,res,next)=>{
     try {
-        const token = req.headers?.authorization || null;
+        // const token = req.headers?.authorization || null;
 
-        if (!token) {
+        if (!req.session.userId) {
             next(HttpErrors(401));
         }
 
-        const data =tokenHandler.decrypt(token);
-        if (!data || !data?.userId || !data?.expiresIn) {
+        // const data =tokenHandler.decrypt(token);
+        // if (!data || !data?.userId || !data?.expiresIn) {
+        //     next(HttpErrors(401));
+        // }
+        if(!(await  userModel.checkIdExists(req.session.userId))) {
             next(HttpErrors(401));
         }
-        if(!(await  userModel.checkIdExists(data.userId))) {
-            next(HttpErrors(401));
-        }
-        if(moment().isAfter(moment(data.expiresIn))){
-            next(HttpErrors(401),'token expired!');
-        }
-        req.userId = data.userId;
+        // if(moment().isAfter(moment(data.expiresIn))){
+        //     next(HttpErrors(401),'token expired!');
+        // }
+        req.userId = req.session.userId;
         next();
     }catch (e){
         next(HttpErrors(401));
