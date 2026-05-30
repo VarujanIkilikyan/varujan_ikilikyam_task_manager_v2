@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import DbMysql from "../clients/db.mysql.js";
+import DbMysql from "../clients/db.connection.js";
 
 export default {
     async create(username, age, email, password) {

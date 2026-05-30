@@ -6,7 +6,7 @@ The project structure, naming, validation library, token mechanism and password 
 
 > Important: this homework keeps the same conventions used in `express-app`:
 > - ES Modules (`"type": "module"`, `import / export`)
-> - `mysql2` with `.promise()` pool/connection (see `clients/db.mysql.js`)
+> - `mysql2` with `.promise()` pool/connection (see `clients/db.connection.js`)
 > - **Joi** for validation (NOT RegExp / NOT Yup)
 > - **crypto-js** AES for tokens (NOT `jsonwebtoken`)
 > - **md5** double-hash with `PASSWORD_SECRET` for passwords (NOT bcrypt)
@@ -340,7 +340,7 @@ express-app/
 ├── package.json
 │
 ├── clients/
-│   └── db.mysql.js                 # existing — DO NOT change the export shape
+│   └── db.connection.js                 # existing — DO NOT change the export shape
 │
 ├── models/
 │   ├── users.js                    # existing

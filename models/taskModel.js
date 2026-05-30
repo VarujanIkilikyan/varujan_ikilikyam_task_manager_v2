@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 
-import DbMysql from "../clients/db.mysql.js";
+import DbMysql from "../clients/db.connection.js";
 
 export default {
     async createTask(userId, title, description, taskDate, details) {

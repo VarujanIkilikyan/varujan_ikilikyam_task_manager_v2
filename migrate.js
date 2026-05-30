@@ -1,4 +1,4 @@
-import DbMysql from './clients/db.mysql.js';
+import DbMysql from './clients/db.connection.js';
 
 ;(async () => {
     console.log('Running migration...');
