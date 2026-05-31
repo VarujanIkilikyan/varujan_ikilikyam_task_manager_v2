@@ -2,7 +2,7 @@ import joi from 'joi';
 
 export default {
     login: joi.object({
-        email: joi.string().required().messages({
+        userEmail: joi.string().required().messages({
             'string.empty': 'Email обязателен',
             'string.email': 'Email должен быть корректным',
         }),
@@ -14,10 +14,10 @@ export default {
         'object.unknown': 'некоректные данные'
     }),
     register: joi.object({
-        username: joi.string().min(3).max(50).required().messages({
+        userName: joi.string().min(3).max(50).required().messages({
             'string.empty': 'Имя обязательно'
         }),
-        age: joi.number().integer().min(6).max(120).required().messages({
+        userAge: joi.number().integer().min(6).max(120).required().messages({
                 'number.base': 'Возраст должен быть числом',
                 'number.integer': 'Возраст должен быть целым числом',
                 'number.min': 'Возраст не может быть меньше 6',
@@ -25,7 +25,7 @@ export default {
                 'any.required': 'Возраст обязателен',
                 'string.empty': 'Возраст обязателен',
             }),
-        email: joi.string().email().min(5).max(100).required().messages({
+        userEmail: joi.string().email().min(5).max(100).required().messages({
             'string.empty': 'Email обязателен',
             'string.email': 'Email должен быть корректным',
         }),
@@ -36,10 +36,10 @@ export default {
         'object.unknown': 'некоректные данные'
     }),
     update: joi.object({
-        user_name: joi.string().min(3).max(50).messages({
+        userName: joi.string().min(3).max(50).messages({
             'string.empty': 'Имя обязательно'
         }),
-        age: joi.number().integer().min(6).max(120).messages({
+        userAge: joi.number().integer().min(6).max(120).messages({
             'number.base': 'Возраст должен быть числом',
             'number.integer': 'Возраст должен быть целым числом',
             'number.min': 'Возраст не может быть меньше 6',

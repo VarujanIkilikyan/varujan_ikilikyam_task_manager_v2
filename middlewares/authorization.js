@@ -1,8 +1,5 @@
 import HttpErrors from 'http-errors';
-import moment from 'moment';
-
-import tokenHandler from '../utils/tokenUtils.js';
-import userModel from "../models/userModel.js";
+import {UsersModel} from '../models/Index.model.js';
 
 
 export  default  async (req,res,next)=>{
@@ -10,6 +7,7 @@ export  default  async (req,res,next)=>{
         // const token = req.headers?.authorization || null;
 
         if (!req.session.userId) {
+            console.log('a')
             next(HttpErrors(401));
         }
 
@@ -17,14 +15,14 @@ export  default  async (req,res,next)=>{
         // if (!data || !data?.userId || !data?.expiresIn) {
         //     next(HttpErrors(401));
         // }
-        if(!(await  userModel.checkIdExists(req.session.userId))) {
+        if(!(await  UsersModel.findByPk(req.session.userId))) {
             next(HttpErrors(401));
         }
         // if(moment().isAfter(moment(data.expiresIn))){
         //     next(HttpErrors(401),'token expired!');
         // }
-        req.userId = req.session.userId;
         next();
+
     }catch (e){
         next(HttpErrors(401));
     }

@@ -22,7 +22,7 @@ Users.init({
             max:120
         }
     },
-    email:{
+        userEmail:{
         type: DataTypes.STRING(255),
         allowNull: false,
         unique:true,

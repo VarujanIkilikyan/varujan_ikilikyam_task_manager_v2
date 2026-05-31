@@ -1,11 +1,7 @@
 import HttpErrors from 'http-errors';
 import bcrypt from "bcrypt";
-import moment from 'moment';
+import {UsersModel} from '../models/Index.model.js';
 
-import usersModel from '../models/userModel.js';
-import tokenHandler from '../utils/tokenUtils.js';
-import userModel from "../models/userModel.js";
-import taskModel from "../models/taskModel.js";
 
 
 export default {
@@ -14,9 +10,9 @@ export default {
     async registration (req, res, next) {
         try {
 
-            const {username,age,email,password} = req.body;
+            const {userName,userAge,userEmail,password} = req.body;
 
-            if(await usersModel.checkEmailExists(email)) {
+            if(await UsersModel.findOne({where:{userEmail}})) {
 
                 throw  new HttpErrors(422,{
                     message: 'Validation error',
@@ -27,16 +23,15 @@ export default {
             }
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const user = await usersModel.create(username,age,email,hashedPassword)
+            const userData = await UsersModel.create(
+                {userName,userAge,userEmail,password:hashedPassword})
 
-            const {user_id:userId,user_name:userName,age:userAge,email:userEmail} = user;
-            const userData ={userId,userName,userAge,userEmail}
-
-
+            const user = userData.toJSON();
+            delete user.password;
 
             res.json({
                 message: 'User created successfully',
-                userData
+                user
             })
         } catch (e) {
             next(e);
@@ -44,9 +39,10 @@ export default {
     },
     async login(req, res, next) {
         try {
-            const {email,password} = req.body;
+            const {userEmail,password} = req.body;
 
-            const user = await usersModel.findUserByEmail(email);
+            let user = await UsersModel.findOne({where:{userEmail}});
+             user = user?.toJSON();
             if(!user || !await bcrypt.compare(password, user.password)){
                 throw new HttpErrors(401, {
                     errors:{
@@ -55,21 +51,13 @@ export default {
                     }
                 })
             }
-            const {user_id:userId,user_name:userName,age:userAge,email:userEmail} = user;
-            const userData ={userId,userName,userAge,userEmail}
 
-            // const token = tokenHandler.encrypt(
-            //     {userId,
-            //         expiresIn: moment().add(30, 'minutes').toISOString(),
-            //     });
-            req.session.userId = userData.userId;
-
-
+            req.session.userId = user.id;
+            delete user.password;
 
             res.json({
                 message: "Login successful",
-                // token,
-                userData
+                user
             })
 
         } catch (e) {
@@ -78,20 +66,16 @@ export default {
     },
     async getUser(req, res, next) {
         try {
-            const {userId} = req;
-
-            const user = await usersModel.findUserById(userId);
-            if(!user){
+            const userData = await UsersModel.findByPk(req.session.userId);
+            if(!userData){
                 throw new HttpErrors(401,'ошыбка при загрузке профиля')
             }
-
-            const {user_name:userName,age:userAge,email:userEmail} = user;
-            const newUserData ={userId,userName,userAge,userEmail}
-
+            const user = userData.toJSON();
+            delete user.password;
 
             res.json({
-                message: `профил ползвтеля ${userName}`,
-                newUserData
+                message: `профил ползвтеля ${user.userName}`,
+                user
             })
 
         } catch (e) {
@@ -100,31 +84,24 @@ export default {
     },
     async updateUser(req, res, next) {
         try {
-            const {userId} = req;
-
-            const u = await  userModel.findUserById(userId);
-
-            const oldUserData ={
-                userId:u.user_id,
-                userName:u.user_name,
-                userAge:u.age,
-                userEmail:u.email,
-            }
-
-
-            const user = await usersModel.updateUser(userId,req.body);
-            if(!user){
+            const userData = await UsersModel.findByPk(req.session.userId);
+            if(!userData){
                 throw new HttpErrors(401,'ошыбка при загрузке профиля')
             }
+            const oldData = userData.toJSON();
+            delete  oldData.password;
 
-            const {user_name:userName,age:userAge,email:userEmail} = user;
-            const newUserData ={userId,userName,userAge,userEmail}
-
+            const Update= await userData.update({...req.body})
+            if(!Update){
+                throw new HttpErrors(401,'ошыбка при обнавления профиля')
+            }
+            const newData = Update.toJSON();
+            delete newData.password;
 
             res.json({
                 message: `данные ползвтеля обнавлены`,
-                oldUserData,
-                newUserData
+                oldData,
+                newData
             })
 
         } catch (e) {
@@ -137,11 +114,29 @@ export default {
 
             const pageNum = Math.max(1, parseInt(page) || 1);
             const limitNum = Math.max(1, parseInt(limit) || 5);
+            const offset = Math.ceil((pageNum - 1) * limit);
 
-            const userList = await userModel.getAllUser(pageNum,limitNum);
+            const {count,rows} = await UsersModel.findAndCountAll({
+                limit: limitNum,
+                offset:offset
+            });
+
+            const userList =[]
+            rows.map((user) => {
+               const ob =user.toJSON()
+                delete ob.password;
+               userList.push(ob);
+            })
+
             res.json({
                 message: 'get all users',
-                userList
+                userList,
+                pagination: {
+                    "currentPage": pageNum,
+                    "totalPages": Math.ceil(count / limit),
+                    "totalUsers": count,
+                    "UsersPerPage": limit,
+                }
             })
         }catch (e){
             next(e);
