@@ -118,6 +118,9 @@ export default {
             if(!newData){
                 throw new HttpErrors(401,'ошыбка при обнавления задачи')
             }
+            if (req.body.details && oldData.details) {
+                await oldData.details.update(req.body.details);
+            }
 
 
             res.json({
