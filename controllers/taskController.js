@@ -1,6 +1,7 @@
 import HttpErrors from 'http-errors';
 
-import taskModel from '../models/taskModel.js';
+import {TasksModel, DetailsModel, UsersModel} from '../models/Index.model.js';
+
 
 export default {
 
@@ -8,9 +9,18 @@ export default {
     async createNewTask (req, res, next) {
         try {
 
-            const {title,description,taskDate,details} = req.body;
+            const {taskTitle,taskDescription,taskDate,details} = req.body;
+            const userId = req.session.userId;
 
-            const task = await taskModel.createTask(req.userId, title, description,taskDate,details)
+            const task = await TasksModel.create({
+                userId,taskTitle,taskDescription,taskDate,details},{
+                include: [{
+                    model: DetailsModel,
+                    as: 'details'
+                }]
+                }
+
+            )
 
             res.json({
                 message: 'task created successfully',
@@ -26,38 +36,62 @@ export default {
 
             const pageNum = Math.max(1, parseInt(page) || 1);
             const limitNum = Math.max(1, parseInt(limit) || 5);
+            const offset = Math.ceil((pageNum - 1) * limit);
 
-            const task = await taskModel.getAllTasksByUser(req.userId,pageNum,limitNum);
+            const {count,rows} = await TasksModel.findAndCountAll({
+                where: {
+                    userId:req.session.userId,
+                },
+                include: [{
+                    model: DetailsModel,
+                    as: 'details'
+                }],
+                limit: limitNum,
+                offset:offset
+            });
+
             res.json({
                 message: 'get all tasks',
-                task
+                tasks: rows,
+                pagination: {
+                    "currentPage": pageNum,
+                    "totalPages": Math.ceil(count / limit),
+                    "totalTasks": count,
+                    "UsersPerPage": +limit,
+                }
             })
         }catch (e){
             next(e);
         }
     },
-    async getAllTasksWithDetails (req, res, next) {
-        try {
-            const {page,limit} = req.query;
-
-            const pageNum = Math.max(1, parseInt(page) || 1);
-            const limitNum = Math.max(1, parseInt(limit) || 5);
-
-            const task = await taskModel.getAllTasksByUserWithDetails(req.userId,pageNum,limitNum);
-            res.json({
-                message: 'get all tasks With Details',
-                task
-            })
-        }catch (e){
-            next(e);
-        }
-    },
+    // async getAllTasksWithDetails (req, res, next) {
+    //     try {
+    //         const {page,limit} = req.query;
+    //
+    //         const pageNum = Math.max(1, parseInt(page) || 1);
+    //         const limitNum = Math.max(1, parseInt(limit) || 5);
+    //
+    //         const task = await taskModel.getAllTasksByUserWithDetails(req.userId,pageNum,limitNum);
+    //         res.json({
+    //             message: 'get all tasks With Details',
+    //             task
+    //         })
+    //     }catch (e){
+    //         next(e);
+    //     }
+    // },
     async getTaskById(req, res, next) {
         try {
             const {id} = req.params;
 
 
-            const task = await taskModel.getTaskById(id,req.userId);
+            const task = await TasksModel.findByPk(id,{
+                where: {userId: req.session.userId},
+                include: [{
+                    model: DetailsModel,
+                    as: 'details'
+                }],
+            });
             res.json({
                 message: 'single task',
                 task
@@ -68,13 +102,28 @@ export default {
     },
     async updateTask(req, res, next) {
         try {
-            const {id} = req.params;
+
+            let oldData = await TasksModel.findByPk(req.params.id,{
+                where: {userId: req.session.userId},
+                include: [{
+                    model: DetailsModel,
+                    as: 'details'
+                }]
+            });
+            if(!oldData){
+                throw new HttpErrors(401,'ошыбка задача не наидена')
+            }
+            const oolddata = oldData.toJSON()
+            const newData= await oldData.update({...req.body})
+            if(!newData){
+                throw new HttpErrors(401,'ошыбка при обнавления задачи')
+            }
 
 
-            const task = await taskModel.updateTask(id,req.userId,req.body);
             res.json({
                 message: 'updatet task',
-                task
+                oolddata,
+                newData
             })
         }catch (e){
             next(e);

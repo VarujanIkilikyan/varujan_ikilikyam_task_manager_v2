@@ -2,7 +2,7 @@ import joi from 'joi';
 
 export default {
     create: joi.object({
-        title: joi.string()
+        taskTitle: joi.string()
             .min(1)
             .max(255)
             .required()
@@ -13,7 +13,7 @@ export default {
                 'string.max': 'Заголовок не может быть длиннее 255 символов'
             }),
 
-        description: joi.string()
+        taskDescription: joi.string()
             .allow('')
             .max(1000)
             .optional()
@@ -31,7 +31,7 @@ export default {
             }),
 
         details: joi.object({
-            priority: joi.string()
+            tasksPriority: joi.string()
                 .valid('low', 'medium', 'high')
                 .allow(null, '')
                 .optional()
@@ -40,7 +40,7 @@ export default {
                     'string.base': 'Приоритет должен быть строкой'
                 }),
 
-            location: joi.string()
+            tasksLocation: joi.string()
                 .allow(null, '')
                 .max(255)
                 .optional()
@@ -48,7 +48,7 @@ export default {
                     'string.max': 'Местоположение не может быть длиннее 255 символов'
                 }),
 
-            notes: joi.string()
+            tasksNotes: joi.string()
                 .allow(null, '')
                 .max(500)
                 .optional()
@@ -104,7 +104,7 @@ export default {
     }),
 
     update: joi.object({
-        title: joi.string()
+        taskTitle: joi.string()
             .trim()
             .allow('')
             .messages({
@@ -112,7 +112,7 @@ export default {
                 'string.trim': 'Заголовок не должен содержать лишних пробелов'
             }),
 
-        description: joi.string()
+        taskDescription: joi.string()
             .trim()
             .allow('')
             .messages({
@@ -120,7 +120,7 @@ export default {
                 'string.trim': 'Описание не должно содержать лишних пробелов'
             }),
 
-        task_date: joi.string()
+        taskDate: joi.string()
             .isoDate()
             .allow('')
             .messages({
@@ -129,7 +129,7 @@ export default {
                 'any.empty': 'Дата задачи не может быть пустой строкой'
             }),
 
-        completed: joi.boolean()
+        taskCompleted: joi.boolean()
             .truthy('true', '1', 'yes', 'on')
             .falsy('false', '0', 'no', 'off')
             .default(false)
@@ -140,7 +140,7 @@ export default {
             }),
 
         details: joi.object({
-            notes: joi.string()
+            tasksNotes: joi.string()
                 .trim()
                 .allow('')
                 .messages({
@@ -148,7 +148,7 @@ export default {
                     'string.trim': 'Заметки не должны содержать лишних пробелов'
                 }),
 
-            location: joi.string()
+            tasksLocation: joi.string()
                 .trim()
                 .allow('')
                 .messages({
@@ -156,7 +156,7 @@ export default {
                     'string.trim': 'Местоположение не должно содержать лишних пробелов'
                 }),
 
-            priority: joi.string()
+            tasksPriority: joi.string()
                 .valid('low', 'medium', 'high')
                 .allow('')
                 .messages({
